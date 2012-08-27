@@ -3,24 +3,49 @@ body
 	background: #303030;
 }
 
-// #gallery a
-// {
-// 	/*-moz-perspective: 100px;*/
+#content
+{
+	position: relative;
+	margin-top: 100px;
+}
 
-// 	border: 1px solid #666;
-// 	display: block;
-// 	height: 75px;
-// 	width: 75px;
-// }
+#spinner
+{
+	background-color: #c6c6c6;
+	border-radius: 10px;
+	box-shadow: 0 0 10px 1px #000;
+	display: none;
+	height: 60px;
+	margin: -30px 0 0 -30px;
+	padding: 5px;
+	width: 60px;
+	z-index: 1;
 
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+
+#reflections,
 #gallery
 {
+	-webkit-perspective: 800;
 	-moz-perspective: 800;
+	perspective: 800;
+
+	opacity: 0;
+	overflow: hidden;
+	margin: 0 auto;
 
 	.tile
 	{
+		-webkit-transform-style: preserve-3d;
 		-moz-transform-style: preserve-3d;
+		transform-style: preserve-3d;
+		
+		-webkit-transition: -webkit-transform 1s;
 		-moz-transition: -moz-transform 1s;
+		transition: transform 1s;
 
 		float: left;
 		height: 75px;
@@ -29,15 +54,20 @@ body
 
 		&.flipped
 		{
+			-webkit-transform: rotateY(-180deg);
 			-moz-transform: rotateY(-180deg);
+			transform: rotateY(-180deg);
+
+			opacity: 1;
 		}
 
 		.front,
 		.back
 		{
+			-webkit-backface-visibility: hidden;
 			-moz-backface-visibility: hidden;
+			backface-visibility: hidden;
 
-			// border: 1px solid #666;
 			height: 100%;
 			position: absolute;
 			width: 100%;
@@ -45,26 +75,21 @@ body
 
 		.front
 		{
-			background-color: red;
+			opacity: 0.5;
 		}
 
 		.back
 		{
+			-webkit-transform: rotateY(180deg);
 			-moz-transform: rotateY(180deg);
+			transform: rotateY(180deg);
 
-			// background-color: blue;
 			background-repeat: no-repeat;
 		}
 	}
 }
 
-#gallery img
+#reflections
 {
-	-moz-transition-property: -moz-transform;
-	-moz-transition-duration: 2s;
-}
-
-.test
-{
-	-moz-transform: rotateY(90deg);
+	opacity: 1;
 }

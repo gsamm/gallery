@@ -16,17 +16,21 @@
 <body>
 	<script id="gallery-item-template" type="text/x-handlebars-template">
 		<div class="tile">
-			<div class="front">
-				<a href="#"><img src="{{url_sq}}" title="{{title}}" alt="{{title}}" /></a>
-			</div>
+			<div class="front"></div>
 			<div class="back"></div>
 		</div>
 	</script>
 
 	<!-- Prompt IE 6 users to install Chrome Frame. -->
 	<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
-	
-	<ul id="gallery"></ul>
+	<div id="spinner">
+		<img src="images/loader.gif" />
+	</div>
+
+	<div id="content">
+		<ul id="gallery"></ul>
+		<!-- <ul id="reflections"></ul> -->
+	</div>
 
 	<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
