@@ -1,3 +1,6 @@
+@tile-height: 51px;
+@tile-width: 51px;
+
 body
 {
 	background: #303030;
@@ -26,7 +29,6 @@ body
 	left: 50%;
 }
 
-#reflections,
 #gallery
 {
 	-webkit-perspective: 800;
@@ -48,9 +50,9 @@ body
 		transition: transform 1s;
 
 		float: left;
-		height: 75px;
+		height: @tile-height;
 		position: relative;
-		width: 75px;
+		width: @tile-width;
 
 		&.flipped
 		{
@@ -59,6 +61,12 @@ body
 			transform: rotateY(-180deg);
 
 			opacity: 1;
+		}
+
+		img
+		{
+			height: @tile-height;
+			width: @tile-width;
 		}
 
 		.front,
@@ -87,9 +95,10 @@ body
 			background-repeat: no-repeat;
 		}
 	}
-}
 
-#reflections
-{
-	opacity: 1;
+	.reflection
+	{
+		-webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(0.5, transparent), to(white)); 
+		-moz-box-reflect: below 0 -moz-gradient(linear, left top, left bottom, from(transparent), color-stop(0.5, transparent), to(white)); 
+	}
 }
