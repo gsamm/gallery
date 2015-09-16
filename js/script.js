@@ -1,9 +1,9 @@
 (function () {
 	var Gallery = {};
 
-	Gallery.IMAGES = 25;
-	Gallery.IMAGES_PER_ROW = 5;
-	Gallery.TILE_WIDTH = Gallery.TILE_HEIGHT = 75;
+	Gallery.IMAGES = 16;
+	Gallery.IMAGES_PER_ROW = 4;
+	Gallery.TILE_WIDTH = Gallery.TILE_HEIGHT = 150;
 
 	// PubSub object to facilitate global events.
 	Gallery.Events = _.extend({}, Backbone.Events);
@@ -14,10 +14,10 @@
 	Gallery.Collections = {};
 	Gallery.Collections.FlickrPhotoCollection = Backbone.Collection.extend({
 		model: Gallery.Models.FlickrPhoto,
-		url: "http://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=1d562390dd25190883b74f6b83bdd74e&extras=url_sq%2C+url_n&per_page=" + Gallery.IMAGES + "&format=json&nojsoncallback=1",
+		url: "https://api.instagram.com/v1/media/search?lat=49.899444&lng=-97.139167&client_id=f16cbf170e71470583ae9bec19f97ab3",
 
 		parse: function (response) {
-			return response.photos.photo;
+			return response.data;
 		}
 	});
 
@@ -38,9 +38,7 @@
 		template: $("#gallery-item-template").html(),
 
 		events: {
-			"click .tile": "tileClicked",
-			"mouseenter .front": "fadeIn",
-			"mouseleave .front": "fadeOut"
+			"click": "tileClicked"
 		},
 
 		initialize: function () {
@@ -52,7 +50,9 @@
 		},
 
 		render: function () {
-			var img = $("<img />").attr("src", this.model.get("url_sq")).load(function () {
+			var thumbnailUrl = this.model.get("images").thumbnail.url;
+
+			var img = $("<img />").attr("src", thumbnailUrl).load(function () {
 				Gallery.Events.trigger("image:loaded");
 			});
 
@@ -67,7 +67,7 @@
 				Gallery.Events.trigger("tile:flipToFront", this.row, this.col);
 			} else {
 				var that = this;
-				var imageUrl = this.model.get("url_n");
+				var imageUrl = this.model.get("images").standard_resolution.url;
 
 				console.log("Started downloading: " + imageUrl);
 				Gallery.Views.SpinnerView.show();
@@ -104,14 +104,6 @@
 			tileBack.css("background-position", "-" + backgroundPositionX + "px -" + backgroundPositionY + "px");
 			
 			this.flip(row, col);
-		},
-
-		fadeIn: function (event) {
-			this.$(".front").stop().animate({ opacity: "1" }, 500);
-		},
-
-		fadeOut: function (event) {
-			this.$(".front").stop().animate({ opacity: "0.5" }, 500);
 		}
 	});
 
@@ -123,25 +115,16 @@
 
 			this.imagesLoaded = 0;
 			this.flickrPhotoViews = [];
-			this.flickrPhotoReflectionViews = [];
 
 			this.collection.each(function (flickrPhoto, i) {
-				that.flickrPhotoViews.push(new Gallery.Views.FlickrPhotoView({
-					model: flickrPhoto,
-					row: Math.floor(i / Gallery.IMAGES_PER_ROW),
-					col: i % Gallery.IMAGES_PER_ROW
-				}));
+				if (i < Gallery.IMAGES) {
+					that.flickrPhotoViews.push(new Gallery.Views.FlickrPhotoView({
+						model: flickrPhoto,
+						row: Math.floor(i / Gallery.IMAGES_PER_ROW),
+						col: i % Gallery.IMAGES_PER_ROW
+					}));
+				}
 			});
-
-			var lastRowIndex = (Gallery.IMAGES / Gallery.IMAGES_PER_ROW - 1) * Gallery.IMAGES_PER_ROW;
-
-			for (var i = lastRowIndex; i < Gallery.IMAGES; i++) {
-				this.flickrPhotoReflectionViews.push(new Gallery.Views.FlickrPhotoView({
-					model: this.collection.at(i),
-					row: Math.floor(i / Gallery.IMAGES_PER_ROW),
-					col: i % Gallery.IMAGES_PER_ROW
-				}));
-			};
 
 			Gallery.Events.on("image:loaded", this.imageLoaded, this);
 
@@ -155,10 +138,6 @@
 
 			_(this.flickrPhotoViews).each(function (flickrPhotoView) {
 				$(that.el).append(flickrPhotoView.render().el);
-			});
-
-			_(this.flickrPhotoReflectionViews).each(function (flickrPhotoView) {
-				$("#reflections").append(flickrPhotoView.render().el);
 			});
 
 			return this;
@@ -187,7 +166,7 @@
 
 		Gallery.Views.SpinnerView.show();
 		flickrPhotoCollection.fetch({
-			dataType: "json",
+			dataType: "jsonp",
 			success: function (collection, response) {
 				new Gallery.Views.FlickrPhotoCollectionView({ 
 					collection: flickrPhotoCollection,
